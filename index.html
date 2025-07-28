@@ -47,6 +47,11 @@
             text-align: center;
             position: relative;
             overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
         .header::before {
@@ -203,6 +208,38 @@
             opacity: 0.8;
         }
 
+        .header-content {
+            flex: 1;
+            text-align: center;
+        }
+
+        .header-qr {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            z-index: 2;
+            position: relative;
+        }
+
+        .header-qr .qr-code {
+            background: white;
+            padding: 8px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-qr .qr-link {
+            font-size: 0.7rem;
+            color: #a8ff9a;
+            text-decoration: none;
+            font-family: 'Courier New', monospace;
+        }
+
+        .header-qr .qr-link:hover {
+            color: #ffeb3b;
+        }
+
         @media (max-width: 768px) {
             .container {
                 margin: 10px;
@@ -228,6 +265,20 @@
             
             .description-cell {
                 max-width: 250px;
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .header-content {
+                order: 1;
+            }
+            
+            .header-qr {
+                order: 2;
             }
         }
 
@@ -296,8 +347,21 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎫 Sistema de Tickets</h1>
-            <p>Relatório de Solicitações e Melhorias do Sistema</p>
+            <div class="header-content">
+                <h1>🎫 Sistema de Tickets</h1>
+                <p>Relatório de Solicitações e Melhorias do Sistema</p>
+            </div>
+            
+            <div class="header-qr">
+                <div class="qr-code">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://kennedysaster.github.io/sprint_dev/" 
+                         alt="QR Code" 
+                         style="display: block; width: 100px; height: 100px;">
+                </div>
+                <a href="https://kennedysaster.github.io/sprint_dev/" target="_blank" class="qr-link">
+                    🔗 sprint_dev
+                </a>
+            </div>
         </div>
 
         <div class="stats-bar">
