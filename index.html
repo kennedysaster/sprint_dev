@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Tickets - Relatório</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2d5a27, #4a8540, #2d5a27);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: slideIn 0.8s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(90deg, #1a3d16, #2d5a27);
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            transition: transform 0.3s ease, background 0.3s ease;
+            min-width: 120px;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #a8ff9a;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .table-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: linear-gradient(90deg, #1a3d16, #2d5a27);
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #4a8540;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 15px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-and { background: #4CAF50; color: white; }
+        .status-fun { background: #2196F3; color: white; }
+
+        .module-badge {
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .id-cell {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #a8ff9a;
+        }
+
+        .author-cell {
+            color: #ffeb3b;
+            font-weight: 500;
+        }
+
+        .description-cell {
+            max-width: 400px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            table {
+                font-size: 0.8rem;
+            }
+            
+            th, td {
+                padding: 10px 8px;
+            }
+            
+            .description-cell {
+                max-width: 250px;
+            }
+        }
+
+        .summary-table {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .summary-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .summary-table th {
+            background: linear-gradient(90deg, #1a3d16, #2d5a27);
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #4a8540;
+        }
+
+        .summary-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            vertical-align: top;
+        }
+
+        .summary-table tr:hover td {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .module-group {
+            font-weight: bold;
+            color: #a8ff9a;
+            background: rgba(168, 255, 154, 0.1);
+            border-left: 4px solid #a8ff9a;
+        }
+
+        .ticket-list {
+            line-height: 1.6;
+        }
+
+        .ticket-id {
+            font-family: 'Courier New', monospace;
+            color: #ffeb3b;
+            margin-right: 8px;
+        }
+
+        .loading-animation {
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎫 Sistema de Tickets</h1>
+            <p>Relatório de Solicitações e Melhorias do Sistema</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-number">14</div>
+                <div class="stat-label">Total de Tickets</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Status Ativos</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <h2 style="color: #a8ff9a; margin-bottom: 20px; text-align: center; font-size: 1.8rem;">📋 Resumo de Tickets por Módulo</h2>
+            
+            <div class="summary-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 15%;">Módulo</th>
+                            <th style="width: 15%;">Quantidade</th>
+                            <th>IDs dos Tickets</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="module-group">AR</td>
+                            <td style="font-weight: bold; color: #a8ff9a;">2</td>
+                            <td class="ticket-list">
+                                <span class="ticket-id">497374</span>
+                                <span class="ticket-id">497429</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="module-group">CM</td>
+                            <td style="font-weight: bold; color: #a8ff9a;">1</td>
+                            <td class="ticket-list">
+                                <span class="ticket-id">495347</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="module-group">CO</td>
+                            <td style="font-weight: bold; color: #a8ff9a;">2</td>
+                            <td class="ticket-list">
+                                <span class="ticket-id">496562</span>
+                                <span class="ticket-id">497017</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="module-group">FP</td>
+                            <td style="font-weight: bold; color: #a8ff9a;">7</td>
+                            <td class="ticket-list">
+                                <span class="ticket-id">495376</span>
+                                <span class="ticket-id">495960</span>
+                                <span class="ticket-id">495989</span>
+                                <span class="ticket-id">496648</span>
+                                <span class="ticket-id">496709</span>
+                                <span class="ticket-id">496794</span>
+                                <span class="ticket-id">497767</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="module-group">PO</td>
+                            <td style="font-weight: bold; color: #a8ff9a;">1</td>
+                            <td class="ticket-list">
+                                <span class="ticket-id">495634</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="module-group">TK</td>
+                            <td style="font-weight: bold; color: #a8ff9a;">1</td>
+                            <td class="ticket-list">
+                                <span class="ticket-id">496725</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2 style="color: #a8ff9a; margin-bottom: 20px; text-align: center; font-size: 1.8rem;">📝 Detalhamento Completo dos Tickets</h2>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Necessidade</th>
+                            <th>Status</th>
+                            <th>Tipo</th>
+                            <th>Módulo</th>
+                            <th>Autor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="id-cell">497374</td>
+                            <td><strong>INFORMAÇÃO DO RESPONSÁVEL DA OBRA</strong></td>
+                            <td class="description-cell">Adicionar (type hints) para o campo responsável da obra. Mensagem: "Para listar a pessoa como responsável, informe no cadastro de pessoa física um dos seguintes tipos de registro: CRT, CAU ou CREA, juntamente com o Nr. de registro."</td>
+                            <td><span class="status-badge status-and">AND</span></td>
+                            <td><span class="status-badge status-fun">FUN</span></td>
+                            <td><span class="module-badge">AR</span></td>
+                            <td class="author-cell">marcos.kennedy</td>
+                        </tr>
+                        <tr>
+                            <td class="id-cell">497429</td>
+                            <td><strong>DISPOSIÇÃO COLUNAS ATIVIDADE/IMÓVEL</strong></td>
+                            <td class="description-cell">Imóvel: Apresentar a coluna situação dos dados de IMOVEL ao pesquisar. Atividade Econômica: Apresentar colunas SITUAÇÃO e INSCRIÇÃO MUNICIPAL para a pesquisa de atividade econômica.</td>
+                            <td><span class="status-badge status-and">AND</span></td>
+                            <td><span class="status-badge status-fun">FUN</span></td>
+                            <td><span class="module-badge">AR</span></td>
+                            <td class="author-cell">marcos.kennedy</td>
+                        </tr>
+                        <tr>
+                            <td class="id-cell">495347</td>
+                            <td><strong>DATA LIMITE PROPOSTA SEM PREENCHIMENTO</strong></td>
+                            <td class="description-cell">Tela: CM023 - LICITAÇÃO. Ao salvar o registro de licitação verificar se o campo data limite proposta está sem preenchimento quando a lei for 14.133/21, gerar nova mensagem de atenção.</td>
+                            <td><span class="status-badge status-and">AND</span></td>
+                            <td><span class="status-badge status-fun">FUN</span></td>
+                            <td><span class="module-badge">CM</span></td>
+                            <td class="author-cell">marcos.kennedy</td>
+                        </tr>
+                        <tr>
+                            <td class="id-cell">496562</td>
+                            <td><strong>HISTÓRICO DE EMPENHO</strong></td>
+                            <td class="description-cell">Aumentar altura e tamanho do campo conforme EV001: ALTURA: height: 140px, TAMANHO: width: 650px</td>
+                            <td><span class="status-badge status-and">AND</span></td>
+                            <td><span class="status-badge status-fun">FUN</span></td>
+                            <td><span class="module-badge">CO</span></td>
+                            <td class="author-cell">marcos.kennedy</td>
+                        </tr>
+                        <tr>
+                            <td class="id-cell">497017</td>
+                            <td><strong>OPERAÇÕES MÚLTIPLAS SELEÇÕES NA COLEÇÃO 'PAGAMENTOS'</strong></td>
+                            <td class="description-cell">Tela: CO324 - Retorno bancário. Adicionar a operação COMPROVANTE DE PAGAMENTO conforme EV001 para as OPERAÇÕES quando utilizar múltipla seleção.</td>
+                            <td><span class="status-badge status-and">AND</span></td>
+                            <td><span class="status-badge status-fun">FUN</span></td>
+                            <td><span class="module-badge">CO</span></td>
+                            <td class="author-cell">larissa.pinheiro</td>
+                        </tr>
+                        <tr>
+                            <td class="id-cell">495376</td>
+                            <td><strong>CADASTRO DE FUNCIONÁRIO</strong></td>
+                            <td class="description-cell">Melhorar a mensagem atual devido à falta do preenchimento da data de nascimento do funcionário e falta do preenchimento em legais do regime previdenciário.</td>
+                            <td><span class="status-badge status-and">AND</span></td>
+                            <td><span class="status-badge status-fun">FUN</span></td>
+                            <td><span class="module-badge">FP</span></td>
+                            <td class="author-cell">marcos.kennedy</td>
+                        </tr>
+                        <tr>
+                            <td class="id-cell">495960</td>
+                            <td><strong>LANÇAMENTO DE FÉRIAS (TIPO AUTOMÁTICO)</strong></td>
+                            <td class="description-cell">Ao lançar férias com o tipo Automático, exibir o período aquisitivo utilizado ao usuário. Hoje, o sistema apenas informa: "Movimentação efetuada com sucesso."</td>
+                            <td><span class="status-badge status-and">AND</span></td>
+                            <td><span class="status-badge status-fun">FUN</span></td>
+                            <td><span class="module-badge">FP</span></td>
+                            <td class="author-cell">marcos.kennedy</td>
+                        </tr>
+                        <tr>
+                            <td class="id-cell">495989</td>
+                            <td><strong>ALTERAÇÃO DE LOTAÇÃO</strong></td>
+                            <td class="description-cell">Tela FP010 - ALTERAÇÃO DE LOTAÇÃO. Permitir ao usuário selecionar lotações de outros órgãos, independentemente do órgão atualmente logado, por meio da inclusão de um novo campo "Órgão de Destino".</td>
+                            <td><span class="status-badge status-and">AND</span></td>
+                            <td><span class="status-badge status-fun">FUN</span></td>
+                            <td><span class="module-badge">FP</span></td>
+                            <td class="author-cell">marcos.kennedy</td>
+                        </tr>
+                        <tr>
+                            <td class="id-cell">496648</td>
+                            <td><strong>NÚMERO DE BENEFÍCIO, CONTROLE SEQUENCIAL</strong></td>
+                            <td class="description-cell">Validação de Número de Benefício para Pensionistas e Aposentados Ativos</td>
+                            <td><span class="status-badge status-and">AND</span></td>
+                            <td><span class="status-badge status-fun">FUN</span></td>
+                            <td><span class="module-badge">FP</span></td>
+                            <td class="author-cell">marcos.kennedy</td>
+                        </tr>
+                        <tr>
+                            <td class="id-cell">496709</td>
+                            <td><strong>EXIBIÇÃO DA COLUNA PERÍODO DE GOZO</strong></td>
+                            <td class="description-cell">Visualização do Período de Gozo por Período Aquisitivo. Atualmente, para consultar o período de gozo, o usuário precisa acessar a coleção ou selecionar a coleção FÉRIAS e rolar horizontalmente.</td>
+                            <td><span class="status-badge status-and">AND</span></td>
+                            <td><span class="status-badge status-fun">FUN</span></td>
+                            <td><span class="module-badge">FP</span></td>
+                            <td class="author-cell">marcos.kennedy</td>
+                        </tr>
+                        <tr>
+                            <td class="id-cell">496794</td>
+                            <td><strong>OPERAÇÕES LANÇAMENTO DE ATESTADO, MÉDICO</strong></td>
+                            <td class="description-cell">Tooltip (Hint) informativo no campo "MÉDICO". Será adicionado um tooltip no campo MÉDICO para orientar o usuário sobre quais profissionais são listados.</td>
+                            <td><span class="status-badge status-and">AND</span></td>
+                            <td><span class="status-badge status-fun">FUN</span></td>
+                            <td><span class="module-badge">FP</span></td>
+                            <td class="author-cell">marcos.kennedy</td>
+                        </tr>
+                        <tr>
+                            <td class="id-cell">497767</td>
+                            <td><strong>EVENTO 2221 EXAME TOXICOLÓGICO</strong></td>
+                            <td class="description-cell">Ao salvar um exame toxicológico na tela FP127, o sistema deve validar a categoria do funcionário vinculada ao exame. Adicionar a informação da categoria do funcionário ao selecionar o funcionário.</td>
+                            <td><span class="status-badge status-and">AND</span></td>
+                            <td><span class="status-badge status-fun">FUN</span></td>
+                            <td><span class="module-badge">FP</span></td>
+                            <td class="author-cell">marcos.kennedy</td>
+                        </tr>
+                        <tr>
+                            <td class="id-cell">495634</td>
+                            <td><strong>VALIDAR MESMA REPARTIÇÃO PRINCIPAL NO MESMO ÓRGÃO</strong></td>
+                            <td class="description-cell">Impedir o cadastro de uma repartição já existente para o mesmo órgão, considerando a combinação de ID Órgão e ID Repartição</td>
+                            <td><span class="status-badge status-and">AND</span></td>
+                            <td><span class="status-badge status-fun">FUN</span></td>
+                            <td><span class="module-badge">PO</span></td>
+                            <td class="author-cell">marcos.kennedy</td>
+                        </tr>
+                        <tr>
+                            <td class="id-cell">496725</td>
+                            <td><strong>VISUALIZAÇÃO TEXTO COLEÇÃO NECESSIDADE</strong></td>
+                            <td class="description-cell">Aumentar o campo de visualização do campo DESCRIÇÃO e JUSTIFICATIVA. DESCRIÇÃO height: 180px, JUSTIFICATIVA height: 180px.</td>
+                            <td><span class="status-badge status-and">AND</span></td>
+                            <td><span class="status-badge status-fun">FUN</span></td>
+                            <td><span class="module-badge">TK</span></td>
+                            <td class="author-cell">marcos.kennedy</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>📊 Relatório gerado automaticamente • <span class="loading-animation">Sistema de Gestão de Tickets</span></p>
+            <p>Dados atualizados em tempo real para melhor acompanhamento das demandas</p>
+        </div>
+    </div>
+</body>
+</html>
